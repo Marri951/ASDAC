@@ -2,6 +2,11 @@ import serial
 import matplotlib.pyplot as plot
 
 def who():
+    '''
+        Sends an identification query to the SCPI device and parses the response
+        to get the brand, model, calibration factor, firmware version, 
+        and the device's communication module.
+    '''
     formattedOut = {}
 
     ser = serial.Serial('COM3', 9600, timeout=1)
@@ -24,6 +29,11 @@ def who():
 
 
 def WaveSpecs():
+    '''
+        Sends a query to get waveform preamble details from the SCPI device.
+        Parses the response to extract waveform specifications such as:
+        bits per sample, encoding, points, sample interval, and voltage scale.
+    '''
     print('Loading waveform details...')
     ser = serial.Serial('COM3', 9600, timeout=1)
 
@@ -43,10 +53,15 @@ def WaveSpecs():
     WaveSpecification['VoltageScale'] = WaveConditions[12]
 
     ser.close()
+    
     return WaveSpecification
 
 
 def ch1Voltage():
+    '''
+        Sends a query to get voltage levels from the SCPI device.
+        Parses the response to get the voltage data.
+    '''
     print('Loading voltage levels...')
 
     ser = serial.Serial('COM3', 9600, timeout=1)
@@ -63,6 +78,10 @@ def ch1Voltage():
 
 
 def VT_Data():
+    '''
+        Utilizes WaveSpecs() and ch1Voltage() to gather and scale voltage data over time, 
+        storing the data in a dictionary where keys are times and values are voltages.
+    '''
     Volt_vs_Time = {}
     time = 0
     print('===========================')
@@ -80,6 +99,10 @@ def VT_Data():
     return Volt_vs_Time
 
 def graph(xyData):
+    '''
+        Plots voltage vs.time data using matplotlib. 
+        If no data is provided, it calls VT_Data() to generate the data to be plotted.
+    '''
     if xyData == None:
         xyData = VT_Data()
 
@@ -100,6 +123,9 @@ def graph(xyData):
     return 1
 
 def baseAnalysis(data):
+    '''
+        Performs basic analysis on voltage data to calculate the range, average, maximum, and minimum voltages.
+    '''
     if type(data) != dict:
         print('Input must be dictionary.')
         return 0
